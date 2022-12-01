@@ -19,7 +19,7 @@ userAgent = ua.random
 options.add_argument(f'user-agent={userAgent}')
 
 #access to the path of your chromedriver.exe
-driver = webdriver.Chrome('/workspace/News_station_analysis/chromedriver.exe')
+driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe')
 #the homepage since you have to sign in first before navigating to the required page for sign in
 driver.get("https://punchng.com/")
 #waits until your page loads completely before sign in process begins
