@@ -1,10 +1,15 @@
 # Nigerian news review
 
-## Webscrapes data from the below stated Nigerian online news oulets
+## Webscrapes data from the below stated Nigerian online news platforms
+
 ### 1. https://punchng.com/
+
 ### 2. https://www.vanguardngr.com/
+
 ### 3. https://thenationonlineng.net/
+
 ### 4. https://guardian.ng/
+
 ### 5. https://www.sunnewsonline.com/
 
 
