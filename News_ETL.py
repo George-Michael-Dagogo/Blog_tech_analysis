@@ -263,4 +263,4 @@ def vanaguard_news():
     engine = create_engine('sqlite:///news.db')
     va.to_sql('vanguard_data', engine, if_exists='append', index=False)
     
-    punch_news()
+punch_news()
