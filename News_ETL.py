@@ -1,0 +1,264 @@
+from selenium.webdriver import Chrome
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from fake_useragent import UserAgent
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import time
+import pandas as pd
+import os
+import re
+from sqlalchemy import create_engine
+
+
+# ### The Punch Newspaper
+def punch_news():
+    options = Options()
+    options.headless = True
+    ua = UserAgent()
+    userAgent = ua.random
+    options.add_argument(f'user-agent={userAgent}')
+
+    c = DesiredCapabilities.CHROME
+    c["pageLoadStrategy"] = "none"
+    #set chromodriver.exe path
+    driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+    #explicit wait
+    w = WebDriverWait(driver, 20)
+    #launch URL
+    driver.get("https://punchng.com/topics/news/")
+    driver.implicitly_wait(20)
+    time.sleep(3)
+    #driver.implicitly_wait(20)
+    #expected condition
+    w.until(EC.presence_of_element_located((By.CLASS_NAME, 'post-title')))
+    #JavaScript Executor to stop page load
+
+    driver.execute_script("window.stop();")
+    print('First huddle')
+
+    content = []
+    contents =driver.find_elements_by_class_name("post-title")
+    for con in contents:
+        cont = con.get_attribute('innerHTML')
+        content.append(cont)
+    af = pd.DataFrame(content,columns =['content'])
+    af.content = af.content.apply(lambda x: x.replace('<a href=', ''))
+    af.content = af.content.apply(lambda x: x.replace('</a>', ''))
+    af.content = af.content.apply(lambda x: x.replace('>', '|'))
+    af = af['content'].str.split("|",n = 3, expand = True)
+    af.columns = ['link','title']
+    af = af.drop_duplicates(subset=["link"], keep='first')
+    print('Second huddle')
+    full_contents = []
+    dates = []
+    by = []
+    def all_news(ev):
+        h = WebDriverWait(driver, 20)
+        full = []
+        timed = []
+        print('Pages extraction in progress')
+
+        driver.get(ev)
+        time.sleep(4)
+        driver.implicitly_wait(20)
+        h.until(EC.presence_of_element_located((By.CLASS_NAME, 'post-content')))
+        #JavaScript Executor to stop page load
+        driver.execute_script("window.stop();")
+        full_content = driver.find_elements_by_class_name("post-content")
+        for conten in full_content:
+            co = conten.get_attribute('innerText')
+            co1 = co.replace('\n\n',' ')
+            co2 = co1.replace('\n',' ')
+            co3 = co2.split(',', 1)
+            full.append(co3)
+
+        date = driver.find_elements_by_class_name("col-lg-4")
+        for dat in date:
+            dat1= dat.get_attribute('innerText')
+            dat2 = dat1.replace('By\xa0\n','')
+            timed.append(dat2)
+        full_contents.append(full[0])
+        dates.append(timed[0])
+        by.append(timed[1])
+
+    m =af.link.to_list()
+    m =  [item.replace('"', '') for item in m]
+    for o in m:
+        all_news(o)
+
+    driver.quit()
+
+    aa = pd.DataFrame({'Title':af.title,'Full_content': full_contents,'Date':dates,'Author':by,'Source_link':af.link})
+    ff  =aa['Full_content'].apply(lambda x: ' '.join(dict.fromkeys(x).keys()))#unlist the full_content column
+
+    aa['Words_count'] = ff.str.split().str.len()#counts the full_content
+    n = open("negative-words.txt", "r")
+    p = open("positive-words.txt", "r")
+    n_word = n.read()
+    p_word = p.read()
+    n.close()
+    p.close()
+    n_word=n_word.replace('\n',',')
+    n_word = re.sub("[^\w]", " ", n_word).split()
+    p_word=p_word.replace('\n',',')
+    p_word = re.sub("[^\w]", " ", p_word).split()
+    aa['Full_content'] = ff
+    #df['word_overlap'] = [set(x[0].split()) & set(x[1].split()) for x in df.values]
+    def negative_words(x):
+        negative_score = 0
+        for word in n_word:
+            if word in x:
+                negative_score += 1
+        return negative_score
+
+    def positive_words(x):
+        positive_score = 0
+        for word in p_word:
+            if word in x:
+                positive_score += 1
+        return positive_score
+    aa['Negative_words'] = aa['Full_content'].apply(lambda x : negative_words(x))
+    aa['Positive_words'] = aa['Full_content'].apply(lambda x : positive_words(x))
+    aa['Sentence_count'] = aa['Full_content'].str.count('[\w][\.!\?]')
+    aa['Sentiment'] = round((aa['Positive_words'] - aa['Negative_words']) / aa['Words_count'], 2)
+    aa['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in aa.Sentiment]
+    engine = create_engine('sqlite:///news.db')
+    aa.to_sql('punch_data', engine, if_exists='append', index=False)
+    
+
+# ## Vanguard Newspaper
+
+def vanaguard_news():
+    options = Options()
+    ua = UserAgent()
+    userAgent = ua.random
+    options.add_argument(f'user-agent={userAgent}')
+    options.headless = True
+    c = DesiredCapabilities.CHROME
+    c["pageLoadStrategy"] = "none"
+    #set chromodriver.exe path
+
+    driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+    #explicit wait
+
+    driver.get("https://www.vanguardngr.com/news/")
+    #explicit wait
+    w = WebDriverWait(driver, 20)
+    #launch URL
+    #driver.get("https://www.vanguardngr.com/category/headlines/")
+    driver.implicitly_wait(20)
+    time.sleep(3)
+    #driver.implicitly_wait(20)
+    #expected condition
+    w.until(EC.presence_of_element_located((By.CLASS_NAME, 'entry-title')))
+    #JavaScript Executor to stop page load
+
+    driver.execute_script("window.stop();")
+    print('First huddle')
+
+    content = []
+    contents =driver.find_elements_by_class_name("entry-title")
+    for con in contents:
+        cont = con.get_attribute('innerHTML')
+        content.append(cont)
+
+    af = pd.DataFrame(content,columns =['content'])
+    af.content = af.content.apply(lambda x: x.replace('<a href="', ''))
+    af = af.iloc[1:]
+    af = af.reset_index()
+    af.content = af.content.apply(lambda x: x.replace('rel="bookmark">', ' | '))
+    af.content = af.content.apply(lambda x: x.replace('</a>', ' '))
+    af = af['content'].str.split("|",n = 3, expand = True)
+    af.columns = ['News_link','Title']
+    sd = af.head(20)
+    driver.quit()
+    full_contents = []
+    dates = []
+    datetime = []
+    genres = []
+    def all_news(ev):
+        options = Options()
+        options.headless = True
+        ua = UserAgent()
+        userAgent = ua.random
+        options.page_load_strategy = 'eager'
+        options.add_argument(f'user-agent={userAgent}')
+        driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',options=options)
+        driver.get(ev)
+        driver.implicitly_wait(20)
+        time.sleep(10)
+
+        full_content = driver.find_elements_by_class_name("entry-content")
+        for conten in full_content:
+            co = conten.get_attribute('innerText')
+            co1 = co.replace('\n\n','')
+            co2 = co1.replace('Subscribe for latest Videos','')
+            #co3 = co2[co2.find('|'):] #deletes anything before the |
+            co3 = co2.replace('\n',' ')
+            co4 = co3.split(',',1)
+            full_contents.append(co4)
+
+        date = driver.find_elements_by_class_name("entry-date.published.updated")
+        for dat in date:
+            date= dat.get_attribute('innerText')
+            dates.append(date)
+            tim= dat.get_attribute('dateTime')
+            datetime.append(tim)
+
+        genre = driver.find_elements_by_xpath("""//*[@id="main"]/header/span/a""")
+        for gen in genre:
+            gen1= gen.get_attribute('innerText')
+            #gen2 = gen1.replace('POSTED IN\n','')
+            genres.append(gen1)
+        print('going')
+        driver.quit()
+
+    a = sd.News_link.to_list()
+    a =  [item.replace('"  ', '') for item in a]
+    #a = ['https://www.vanguardngr.com/2022/12/mavins-marks-10th-anniversary-with-new-album/']
+    for i in a:
+        all_news(i)
+
+    ss = pd.DataFrame({'Full_content': full_contents,'Date':dates,'Time_published':datetime})
+    ff  =ss['Full_content'].apply(lambda x: ' '.join(dict.fromkeys(x).keys()))
+
+    ss['Words_count'] = ff.str.split().str.len()
+    n = open("negative-words.txt", "r")
+    p = open("positive-words.txt", "r")
+    n_word = n.read()
+    p_word = p.read()
+    n.close()
+    p.close()
+    n_word=n_word.replace('\n',',')
+    n_word = re.sub("[^\w]", " ", n_word).split()
+    p_word=p_word.replace('\n',',')
+    p_word = re.sub("[^\w]", " ", p_word).split()
+    #df['word_overlap'] = [set(x[0].split()) & set(x[1].split()) for x in df.values]
+    def negative_words(x):
+        negative_score = 0
+        for word in n_word:
+            if word in x:
+                negative_score += 1
+        return negative_score
+
+    def positive_words(x):
+        positive_score = 0
+        for word in p_word:
+            if word in x:
+                positive_score += 1
+        return positive_score
+    ss['Full_content'] = ff
+    ss['News_genre'] = genres
+    ss['Negative_words'] = ss['Full_content'].apply(lambda x : negative_words(x))
+    ss['Positive_words'] = ss['Full_content'].apply(lambda x : positive_words(x))
+    ss['Sentence_count'] = ss['Full_content'].str.count('[\w][\.!\?]')
+
+    ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
+    ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
+    va = pd.concat([sd,ss], axis=1)
+    engine = create_engine('sqlite:///news.db')
+    va.to_sql('vanguard_data', engine, if_exists='append', index=False)
