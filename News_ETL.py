@@ -25,7 +25,7 @@ def punch_news():
     c = DesiredCapabilities.CHROME
     c["pageLoadStrategy"] = "none"
     #set chromodriver.exe path
-    driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+    driver = webdriver.Chrome('chromedriver.exe',desired_capabilities=c,options=options)
     #explicit wait
     w = WebDriverWait(driver, 20)
     #launch URL
@@ -142,7 +142,7 @@ def vanaguard_news():
     c["pageLoadStrategy"] = "none"
     #set chromodriver.exe path
 
-    driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+    driver = webdriver.Chrome('chromedriver.exe',desired_capabilities=c,options=options)
     #explicit wait
 
     driver.get("https://www.vanguardngr.com/news/")
@@ -187,7 +187,7 @@ def vanaguard_news():
         userAgent = ua.random
         options.page_load_strategy = 'eager'
         options.add_argument(f'user-agent={userAgent}')
-        driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',options=options)
+        driver = webdriver.Chrome('chromedriver.exe',options=options)
         driver.get(ev)
         driver.implicitly_wait(20)
         time.sleep(10)
@@ -262,3 +262,5 @@ def vanaguard_news():
     va = pd.concat([sd,ss], axis=1)
     engine = create_engine('sqlite:///news.db')
     va.to_sql('vanguard_data', engine, if_exists='append', index=False)
+    
+    punch_news()
