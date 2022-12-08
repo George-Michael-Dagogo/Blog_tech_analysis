@@ -17,7 +17,7 @@
 >
 
 
-### * Each news oulet has its table in the database
-### * Ehecks if the news is positive, negative or neutral 
+### * Each news outlet has its table in a database
+### * Checks if the news is positive, negative or neutral 
 ### * Checks the most used word of the day
 ### * Sends a summary to an email or several when the code is run
