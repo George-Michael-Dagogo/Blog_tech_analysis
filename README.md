@@ -2,11 +2,11 @@
 
 ## Webscrapes data from the below stated Nigerian online news platforms
 
-### 1. https://punchng.com/   The Punch Newspaper         :raised_eyebrow:
+### 1. https://punchng.com/   The Punch Newspaper         :heavy_check_mark:
 
-### 2. https://www.vanguardngr.com/    Vanguard Newspapaer       :raised_eyebrow:
+### 2. https://www.vanguardngr.com/    Vanguard Newspapaer       :heavy_check_mark:
 
-### 3. https://thenationonlineng.net/    The Nation Newspaper       :raised_eyebrow:
+### 3. https://thenationonlineng.net/    The Nation Newspaper       :heavy_check_mark:
 
 ### 4. https://guardian.ng/     The Guardian Newspaper 
 
