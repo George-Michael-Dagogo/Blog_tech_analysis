@@ -2,11 +2,11 @@
 
 ## Webscrapes data from the below stated Nigerian online news platforms
 
-### 1. https://punchng.com/   The Punch Newspaper         "heavy_check_mark": "https://github.githubassets.com/images/icons/emoji/unicode/2714.png?v8"
+### 1. https://punchng.com/   The Punch Newspaper         :raised_eyebrow:
 
-### 2. https://www.vanguardngr.com/    Vanguard Newspapaer       "heavy_check_mark": "https://github.githubassets.com/images/icons/emoji/unicode/2714.png?v8"
+### 2. https://www.vanguardngr.com/    Vanguard Newspapaer       :raised_eyebrow:
 
-### 3. https://thenationonlineng.net/    The Nation Newspaper       "heavy_check_mark": "https://github.githubassets.com/images/icons/emoji/unicode/2714.png?v8"
+### 3. https://thenationonlineng.net/    The Nation Newspaper       :raised_eyebrow:
 
 ### 4. https://guardian.ng/     The Guardian Newspaper 
 
