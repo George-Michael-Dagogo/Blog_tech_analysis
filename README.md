@@ -2,18 +2,22 @@
 
 ## Webscrapes data from the below stated Nigerian online news platforms
 
-### 1. https://punchng.com/
+### 1. https://punchng.com/   The Punch Newspaper         :heavy_check_mark:
 
-### 2. https://www.vanguardngr.com/
+### 2. https://www.vanguardngr.com/    Vanguard Newspapaer       :heavy_check_mark:
 
-### 3. https://thenationonlineng.net/
+### 3. https://thenationonlineng.net/    The Nation Newspaper       :heavy_check_mark:
 
-### 4. https://guardian.ng/
+### 4. https://guardian.ng/     The Guardian Newspaper            :o:
 
-### 5. https://www.sunnewsonline.com/
+### 5. https://www.sunnewsonline.com/     The Sun News          :o:
+
+##
+##
+>
 
 
-### each news oulet has its table in the database
-### checks if the news is positive, negative or neutral 
-### checks the most used word of the day
-### sends a summary to an email or several
+### * Each news outlet has its table in a database
+### * Checks if the news is positive, negative or neutral 
+### * Checks the most used word of the day
+### * Sends a summary to an email or several when the code is run
