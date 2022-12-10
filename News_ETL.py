@@ -374,3 +374,118 @@ def the_nation():
     ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
     engine = create_engine('sqlite:///news.db')
     ss.to_sql('nation_newspaper_data', engine, if_exists='append', index=False)
+    
+    
+    
+def the_guardian():
+    options = Options()
+    options.headless = True
+    ua = UserAgent()
+    userAgent = ua.random
+    options.add_argument(f'user-agent={userAgent}')
+
+    c = DesiredCapabilities.CHROME
+    c["pageLoadStrategy"] = "none"
+    #set chromodriver.exe path
+    driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+    #explicit wait
+    w = WebDriverWait(driver, 20)
+    #launch URL
+    driver.get("https://guardian.ng/latest/")
+    driver.implicitly_wait(20)
+
+    #driver.implicitly_wait(20)
+    #expected condition
+    w.until(EC.presence_of_element_located((By.CLASS_NAME, 'title')))
+    #JavaScript Executor to stop page load
+
+    driver.execute_script("window.stop();")
+    print('First huddle')
+
+    content = []
+    contents =driver.find_elements_by_css_selector('div main section div div div span a')
+    for con in contents:
+        cont = con.get_attribute('href')
+        content.append(cont)
+    af = pd.DataFrame(content,columns =['content'])   
+    titless = []
+    by = []
+    dates = []
+    full_content = []
+
+    def all_news(ev):
+        fully = []
+        #driver = webdriver.Chrome(r'C:\Users\HP\Downloads\news\News_station_analysis\chromedriver.exe',desired_capabilities=c,options=options)
+        h = WebDriverWait(driver, 20)
+        driver.get(ev)
+        time.sleep(5)
+        driver.implicitly_wait(20)
+        h.until(EC.presence_of_element_located((By.CLASS_NAME, 'content')))
+        #JavaScript Executor to stop page load
+        driver.execute_script("window.stop();")
+        title = driver.find_elements_by_css_selector('div main div h1')
+        for tit in title:
+            titl = tit.get_attribute('innerText')
+            titless.append(titl)
+        print('Extration in progress')
+        bywho = driver.find_elements_by_css_selector('div main div div div div strong')
+        for byw in bywho:
+            who = byw.get_attribute('innerText')
+            by.append(who)
+
+        date = driver.find_elements_by_class_name('date')
+        for dat in date:
+            d = dat.get_attribute('innerText')
+            d = d.replace('\xa0 | \xa0', 'at')
+            dates.append(d)
+        #driver.find_elements_by_css_selector('div main div div div p')   
+        full_cont = driver.find_elements_by_css_selector('div main div div div p')  
+        for full in full_cont:
+            full_c = full.get_attribute('innerText')
+            full_c = full_c.replace('\nDownload logo\n', '')
+            full_c = full_c.replace('\xa0', '')
+            #full_c = [full_c]
+            #full_c = ' '.join(full_c)
+            fully.append(full_c)
+
+        article = ' '.join(fully)
+        full_content.append(article)
+
+    for i in af.content:
+        all_news(i)
+
+    driver.quit()
+    ss = pd.DataFrame({'Title': titless,'Full_content': full_content,'Date':dates,'Author':by,'News_link':af.content})
+    ss['Words_count'] = ss.Full_content.str.split().str.len()
+    n = open("negative-words.txt", "r")
+    p = open("positive-words.txt", "r")
+    n_word = n.read()
+    p_word = p.read()
+    n.close()
+    p.close()
+    n_word=n_word.replace('\n',',')
+    n_word = re.sub("[^\w]", " ", n_word).split()
+    p_word=p_word.replace('\n',',')
+    p_word = re.sub("[^\w]", " ", p_word).split()
+    def negative_words(x):
+        negative_score = 0
+        for word in n_word:
+            if word in x:
+                negative_score += 1
+        return negative_score
+
+    def positive_words(x):
+        positive_score = 0
+        for word in p_word:
+            if word in x:
+                positive_score += 1
+        return positive_score
+
+    ss['Negative_words'] = ss['Full_content'].apply(lambda x : negative_words(x))
+    ss['Positive_words'] = ss['Full_content'].apply(lambda x : positive_words(x))
+    ss['Sentence_count'] = ss['Full_content'].str.count('[\w][\.!\?]')
+
+    ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
+    ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
+    engine = create_engine('sqlite:///news.db')
+    ss.to_sql('guardian_data', engine, if_exists='append', index=False)
