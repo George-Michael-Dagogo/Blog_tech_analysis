@@ -10,7 +10,7 @@
 
 ### 4. https://guardian.ng/     The Guardian Newspaper            :heavy_check_mark:
 
-### 5. https://www.sunnewsonline.com/     The Sun News          :o:
+### 5. https://www.sunnewsonline.com/     The Sun News          :heavy_check_mark:
 
 ##
 ##
