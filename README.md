@@ -16,8 +16,13 @@
 ##
 >
 
+## Phase 1
+### * The script Checks if a particular news is positive, negative or neutral.
+### * An AZURE single postgres database server was used to store the webscraped data.
+### * The script was automated and scheduled with Prefect to run every 3 hours.
+### * This was hosted on an AZURE VM.
+### * Each news outlet has its table in the Postgres database.
 
-### * Each news outlet has its table in a database
-### * Checks if the news is positive, negative or neutral 
-### * Checks the most used word of the day
+## Phase 2
+### * Checks the most used word of the day.
 ### * Sends a summary to an email or several when the code is run
