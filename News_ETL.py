@@ -808,20 +808,24 @@ def the_sun():
    
 
 
-# In[26]:
+
+def flow_caso(schedule=None):
+    with Flow("news_pipeline",schedule=schedule) as flow:
+        
+        Punch_news = punch_news()
+        Vanguard_news = vanguard_news()
+        The_nation_news = the_nation()
+        The_guardian = the_guardian()
+        The_Sun = the_sun()        
+
+    return flow
 
 
-the_sun()
+schedule = IntervalSchedule(
+    start_date = datetime.datetime.now() + datetime.timedelta(seconds = 2),
+    interval = datetime.timedelta(hours=3)
+)
+flow=flow_caso(schedule)
 
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+flow.run()
 
