@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[27]:
+# In[15]:
 
 
 from selenium.webdriver import Chrome
@@ -17,8 +17,12 @@ import time
 import pandas as pd
 import os
 import re
+import datetime
 from sqlalchemy import create_engine
 import psycopg2
+from prefect import Flow,task
+from datetime import datetime as dt
+from prefect.schedules import IntervalSchedule
 
 
 # In[ ]:
@@ -32,6 +36,7 @@ import psycopg2
 # In[2]:
 
 
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def punch_news():
     options = Options()
     options.headless = True
@@ -148,9 +153,11 @@ def punch_news():
         return positive_score
     aa['Negative_words'] = aa['Full_content'].apply(lambda x : negative_words(x))
     aa['Positive_words'] = aa['Full_content'].apply(lambda x : positive_words(x))
+    
     aa['Sentence_count'] = aa['Full_content'].str.count('[\w][\.!\?]')
     aa['Sentiment'] = round((aa['Positive_words'] - aa['Negative_words']) / aa['Words_count'], 2)
     aa['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in aa.Sentiment]
+    aa['database_time'] = dt.now()
     ##
     ##
     ##       LOADING
@@ -186,9 +193,10 @@ def punch_news():
 
 # ## Vanguard Newspaper
 
-# In[8]:
+# In[22]:
 
 
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def vanguard_news():
     options = Options()
     ua = UserAgent()
@@ -235,7 +243,7 @@ def vanguard_news():
     af.content = af.content.apply(lambda x: x.replace('</a>', ' '))
     af = af['content'].str.split("|",n = 3, expand = True)
     af.columns = ['News_link','Title']
-    sd = af.head(20)
+    sd = af.head(5)
     driver.quit()
     full_contents = []
     dates = []
@@ -318,14 +326,16 @@ def vanguard_news():
                 positive_score += 1
         return positive_score
     ss['Full_content'] = ff
-    ss['News_genre'] = genres
+    ss['database_time'] = dt.now()
     ss['Negative_words'] = ss['Full_content'].apply(lambda x : negative_words(x))
     ss['Positive_words'] = ss['Full_content'].apply(lambda x : positive_words(x))
     ss['Sentence_count'] = ss['Full_content'].str.count('[\w][\.!\?]')
+    #ss['database_time'] = datetime.datetime.now()
 
     ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
     ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
     va = pd.concat([sd,ss], axis=1)
+    print(va)
     ##
     ##
     ##       LOADING
@@ -364,6 +374,7 @@ def vanguard_news():
 # In[102]:
 
 
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def the_nation():
     options = Options()
     options.headless = True
@@ -480,6 +491,7 @@ def the_nation():
 
     ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
     ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
+    ss['database_time'] = dt.now()
     ##
     ##
     ##       LOADING
@@ -512,6 +524,7 @@ def the_nation():
 # In[45]:
 
 
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def the_guardian():
     options = Options()
     options.headless = True
@@ -631,6 +644,7 @@ def the_guardian():
 
     ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
     ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
+    ss['database_time'] = dt.now()
     ##
     ##
     ##       LOADING
@@ -669,6 +683,7 @@ def the_guardian():
 # In[25]:
 
 
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def the_sun():
     options = Options()
     options.headless = True
@@ -779,6 +794,7 @@ def the_sun():
 
     ss['Sentiment'] = round((ss['Positive_words'] - ss['Negative_words']) / ss['Words_count'], 2)
     ss['News_type'] = ['Bad News' if x < 0 else 'Good News' if x > 0 else 'Neutral' for x in ss.Sentiment]
+    ss['database_time'] = dt.now()
     ##
     ##
     ##       LOADING
@@ -808,6 +824,11 @@ def the_sun():
    
 
 
+# ## Automation and Scheduling with PREFECT
+# #### Runs every 3 hours
+
+# In[1]:
+
 
 def flow_caso(schedule=None):
     with Flow("news_pipeline",schedule=schedule) as flow:
@@ -828,4 +849,16 @@ schedule = IntervalSchedule(
 flow=flow_caso(schedule)
 
 flow.run()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
