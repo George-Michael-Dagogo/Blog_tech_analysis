@@ -19,9 +19,12 @@
 ## Phase 1
 ### * The script Checks if a particular news is positive, negative or neutral.
 ### * An AZURE single postgres database server was used to store the webscraped data.
+### * Each news outlet has its table in the Postgres database.
+### * Any records older than 2 days will be deleted from each database table.
+### * Duplicate values will also removed from each database table.
 ### * The script was automated and scheduled with Prefect to run every 3 hours.
 ### * This was hosted on an AZURE VM.
-### * Each news outlet has its table in the Postgres database.
+
 
 ## Phase 2
 ### * Checks the most used word of the day.
