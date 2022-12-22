@@ -22,10 +22,15 @@
 ### * Each news outlet has its table in the Postgres database.
 ### * Any records older than 2 days will be deleted from each database table.
 ### * Duplicate values will also removed from each database table.
-### * The script was automated and scheduled with Prefect to run every 3 hours.
-### * This was hosted on an AZURE VM.
 
 
 ## Phase 2
-### * Checks the most used word of the day.
-### * Sends a summary to an email or several when the code is run
+### * Queries the database to get the count of each news sentiment, visualize it and save as png.
+### * Checks the most used word of the day, visualize it and save as png.
+### * Checks for the Author with the most count, visualize it and save as png.
+### * Gets a list of the news types with the sentiment 'Good News'. 
+### * Sends a summary to an email or several.
+
+## Phase 3
+### * The script was automated and scheduled with Prefect to run every 3 hours.
+### * This was hosted on an AZURE VM.
