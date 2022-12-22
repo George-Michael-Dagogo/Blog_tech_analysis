@@ -1,3 +1,4 @@
+![alt text](https://github.com/George-Michael-Dagogo/News_station_analysis/blob/main/NEWS.jpg)
 # Nigerian news review
 
 ## Webscrapes data from the below stated Nigerian online news platforms
