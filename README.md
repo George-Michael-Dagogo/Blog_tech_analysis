@@ -1,6 +1,8 @@
-![alt text](https://github.com/George-Michael-Dagogo/News_station_analysis/blob/main/NEWS.jpg)
 # Nigerian news review
 # The objective of this project was to web-scrape news data from 5 popular online news outlets, clean and transform it, carry out sentiment analysis and categorize it into positive, negative and neutral news then create visualizations which summarizes the data and send it to several email addresses.
+
+## Architecture
+![alt text](https://github.com/George-Michael-Dagogo/News_station_analysis/blob/main/NEWS.jpg)
 
 ## Webscrapes data from the below stated Nigerian online news platforms
 
