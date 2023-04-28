@@ -1,7 +1,6 @@
-# Nigerian news review
-# The primary goal of this project was to leverage web-scraping techniques to collect news data from five prominent online news outlets. Through advanced data cleaning and transformation techniques, we aimed to conduct sentiment analysis, categorize the data into positive, negative, and neutral news, and create insightful visualizations to better understand the underlying patterns and trends.
-
-To further enhance the project's value, we incorporated an automated email delivery feature to disseminate the visualized data to several email addresses. 
+# Online News Sentimental Analysis
+# The primary goal of this project was to leverage web-scraping techniques to collect news data from five prominent online news outlets. Through advanced data cleaning and transformation techniques, we aimed to conduct sentiment analysis, categorize the data into positive, negative, and neutral news, and create insightful visualizations to better understand the underlying patterns and trends. 
+# To further enhance the project's value, we incorporated an automated email delivery feature to disseminate the visualized data to several email addresses. 
 
 ## Architecture
 ![alt text](https://github.com/George-Michael-Dagogo/News_station_analysis/blob/main/NEWS.jpg)
